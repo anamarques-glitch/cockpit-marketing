@@ -1,0 +1,1057 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cockpit de Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caladea:wght@400;700&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: régua mensal — cabeçalho com seletor de mês, faixa de 4 frentes, depois um painel por frente e a área de dados no fim */
+:root {
+  --bg: #F1F0E8; --surface: #FBFAF6; --ink: #0F110E; --ink-2: #45463D; --muted: #75756B; --line: #DCDBD0;
+  --accent: #666343; --accent-ink: #FBFAF6; --accent-soft: #DCE4DC;
+  --s1: #5A6A0C; --s2: #2F6FA8; --s3: #C27A2C; --s4: #A8457C;
+  --good: #3C7A3E; --warn: #9A6400; --crit: #B23A3A; --neutral: #9A9A8E;
+  --display: Cambria, Caladea, Georgia, 'Times New Roman', serif;
+  --body: Calibri, Carlito, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121410; --surface: #1A1C17; --ink: #ECECE4; --ink-2: #C4C4B9; --muted: #95958B; --line: #2E312A;
+  --accent: #B9B78E; --accent-ink: #121410; --accent-soft: #2A3329;
+  --s1: #869824; --s2: #4E8FD0; --s3: #C8823C; --s4: #C86A9E;
+  --good: #6DB36F; --warn: #D9A13B; --crit: #E07272; --neutral: #6E6E66; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121410; --surface: #1A1C17; --ink: #ECECE4; --ink-2: #C4C4B9; --muted: #95958B; --line: #2E312A;
+  --accent: #B9B78E; --accent-ink: #121410; --accent-soft: #2A3329;
+  --s1: #869824; --s2: #4E8FD0; --s3: #C8823C; --s4: #C86A9E;
+  --good: #6DB36F; --warn: #D9A13B; --crit: #E07272; --neutral: #6E6E66; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45 }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; display: grid; gap: 28px }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0 }
+.num { font-variant-numeric: tabular-nums }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+button, select, input, textarea { font: inherit; color: inherit }
+button { cursor: pointer }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+/* Cabeçalho */
+header.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 16px }
+.brand { display: grid; gap: 2px }
+.brand h1 { font-size: clamp(26px, 4vw, 34px); letter-spacing: -.01em }
+.brand .sub { color: var(--ink-2) }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+.controls label { font-size: 13px; color: var(--muted) }
+select, input[type=month] { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 7px 10px }
+.btn { border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); border-radius: var(--r); padding: 8px 14px; font-weight: 700 }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line) }
+.btn:disabled { opacity: .5; cursor: default }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px }
+
+/* Faixa das frentes */
+.fronts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 900px) { .fronts { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 480px) { .fronts { grid-template-columns: 1fr } }
+.front { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 6px; align-content: start; text-align: left; color: inherit; text-decoration: none }
+.front:hover { border-color: var(--accent) }
+.front .big { font-family: var(--display); font-size: 38px; line-height: 1; font-weight: 700 }
+.front .unit { font-size: 14px; color: var(--ink-2) }
+.front .meta { font-size: 13px; color: var(--muted); min-height: 1.4em }
+.delta { font-size: 13px; font-weight: 700 }
+.delta.up { color: var(--good) } .delta.down { color: var(--crit) } .delta.flat { color: var(--muted) }
+.spark { display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 4px }
+.spark i { flex: 1; max-width: 18px; background: var(--accent-soft); border-radius: 2px 2px 0 0; min-height: 2px }
+.spark i.cur { background: var(--accent) }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); width: fit-content }
+.pill::before { content: ''; width: 7px; height: 7px; border-radius: 50% ; background: var(--neutral) }
+.pill.ok::before { background: var(--good) } .pill.wait::before { background: var(--warn) }
+
+/* Painéis */
+section.panel { display: grid; gap: 16px; scroll-margin-top: 12px }
+.panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px }
+.panel-head h2 { font-size: 24px }
+.panel-head .src { font-size: 13px; color: var(--muted) }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0 }
+.card h3 { font-size: 16px }
+.c3 { grid-column: span 3 } .c4 { grid-column: span 4 } .c5 { grid-column: span 5 } .c6 { grid-column: span 6 } .c7 { grid-column: span 7 } .c8 { grid-column: span 8 } .c12 { grid-column: span 12 }
+@media (max-width: 900px) { .c3 { grid-column: span 6 } .c4, .c5, .c6, .c7, .c8 { grid-column: span 12 } }
+@media (max-width: 480px) { .c3 { grid-column: span 12 } }
+.kpi { display: grid; gap: 2px }
+.kpi .v { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1.05 }
+.kpi .l { font-size: 13px; color: var(--ink-2) }
+.empty { border: 1px dashed var(--line); border-radius: var(--r); padding: 22px; color: var(--ink-2); display: grid; gap: 8px; justify-items: start; background: color-mix(in srgb, var(--surface) 55%, transparent) }
+.empty strong { color: var(--ink) }
+.note { font-size: 13px; color: var(--muted) }
+
+/* Barras horizontais */
+.bars { display: grid; gap: 9px }
+.bar { display: grid; grid-template-columns: minmax(90px, 34%) 1fr auto; gap: 10px; align-items: center; font-size: 14px }
+.bar .n { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.bar .t { height: 12px; background: color-mix(in srgb, var(--line) 55%, transparent); border-radius: 0 4px 4px 0; display: flex; gap: 2px; overflow: hidden }
+.bar .t i { display: block; height: 100%; min-width: 2px }
+.bar .t i:last-child { border-radius: 0 4px 4px 0 }
+.bar .v { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 2.5em; text-align: right }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--ink-2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.legend b { width: 10px; height: 10px; border-radius: 2px; display: inline-block }
+
+/* Tabelas */
+.tbl { overflow-x: auto }
+table { width: 100%; border-collapse: collapse; font-size: 14px }
+th { text-align: left; font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap }
+td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums }
+tr:last-child td { border-bottom: 0 }
+.tag { font-size: 12px; padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--ink); white-space: nowrap }
+.st { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap }
+.st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--neutral)) }
+
+svg text { fill: var(--ink-2); font-family: var(--body); font-size: 12px }
+svg .grid-l { stroke: var(--line) }
+svg .tot { fill: var(--ink); font-weight: 700 }
+
+/* Dados */
+details.data { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r) }
+details.data > summary { padding: 14px 16px; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 18px }
+.data-body { padding: 0 16px 16px; display: grid; gap: 18px }
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; align-items: end }
+.form label { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2) }
+textarea { width: 100%; min-height: 90px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; font-size: 13px; font-family: ui-monospace, Menlo, monospace }
+.preview { border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--bg); border-radius: 0 var(--r) var(--r) 0; display: grid; gap: 8px }
+.preview.err { border-color: var(--crit) }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+.hint { font-size: 13px; color: var(--muted); display: grid; gap: 4px }
+.hint code { font-size: 12px }
+
+/* Abas */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: -12px }
+.tabs [role=tab] { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 18px; font-family: var(--display); font-size: 18px; font-weight: 700; color: var(--muted); margin-bottom: -1px }
+.tabs [role=tab][aria-selected=true] { color: var(--ink); border-bottom-color: var(--accent) }
+.tabs [role=tab]:hover { color: var(--ink) }
+.tabpanel { display: grid; gap: 28px }
+.cols2 { columns: 2; column-gap: 32px } .cols2 .bars { display: block } .cols2 .bar { break-inside: avoid; margin-bottom: 9px }
+@media (max-width: 700px) { .cols2 { columns: 1 } }
+svg .cur-w { fill: var(--accent-soft); opacity: .55 }
+tr.hl td { background: color-mix(in srgb, var(--accent-soft) 45%, transparent) }
+.bar-in { display: flex; gap: 2px; height: 12px; border-radius: 0 4px 4px 0; overflow: hidden; min-width: 2px }
+.bar-in i { display: block; height: 100% }
+.status-line:empty { display: none }
+
+
+/* Campanhas */
+.camps-wrap { display: grid; gap: 12px; min-width: 0 }
+.camps-wrap h3 { font-size: 16px }
+.camps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px }
+.camp { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; display: grid; grid-template-rows: auto 1fr }
+.camp.novo { border-color: var(--s2) }
+.ph { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--accent-soft); display: grid; place-items: center }
+.ph img { width: 100%; height: 100%; object-fit: cover; display: block }
+.ph-empty { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--accent); letter-spacing: .02em }
+.ph-up { position: absolute; right: 8px; bottom: 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 3px 9px; font-size: 12px; font-weight: 700; cursor: pointer }
+.ph-up:focus-within { outline: 2px solid var(--accent) }
+.cb { padding: 12px 14px; display: grid; gap: 6px; align-content: start }
+.ct { display: flex; justify-content: space-between; gap: 8px; align-items: baseline }
+.ct strong { font-family: var(--display); font-size: 16px; line-height: 1.2 }
+.cm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 4px 0 0 }
+.cm dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+.cm dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums }
+.camps.sm { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) }
+.camps.sm .ph { aspect-ratio: 16 / 9 }
+.camps.sm .cm { display: none }
+.tbl a { color: var(--accent); font-weight: 700; text-underline-offset: 3px }
+details.sem { border-top: 1px solid var(--line) } details.sem:first-of-type { margin-top: 8px }
+details.sem > summary { cursor: pointer; padding: 10px 0; display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; font-weight: 700 }
+details.sem .tbl { margin-bottom: 12px }
+details.paus > summary { cursor: pointer; font-weight: 700; color: var(--ink-2); padding: 6px 0 }
+details.paus .camps { margin-top: 8px }
+
+
+.subtabs { display: flex; gap: 6px; flex-wrap: wrap }
+.subtabs [role=tab] { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-weight: 700; color: var(--ink-2) }
+.subtabs [role=tab][aria-selected=true] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
+.subtabs .count { font-weight: 400; opacity: .8; margin-left: 2px }
+
+
+.aud { gap: 6px }
+.aud-v { display: flex; align-items: baseline; gap: 8px }
+.aud .v { font-family: var(--display); font-size: 34px; font-weight: 700; line-height: 1 }
+.aud .l { color: var(--ink-2) }
+.aud .spark { max-width: 220px }
+.aud-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px }
+.aud-net { font-size: 13px; color: var(--ink-2); font-weight: 700 }
+.aud-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: end }
+.aud-form label { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2) }
+.aud-form input { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); padding: 7px 10px; width: 100%; font-variant-numeric: tabular-nums }
+.aud-hist > summary { cursor: pointer; font-weight: 700; color: var(--ink-2); padding: 4px 0 }
+.aud-hist .tbl { margin-top: 6px }
+.ph-empty[hidden] { display: none }
+.seg-form input { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 7px 10px; width: 100% }
+
+.warn-note { color: var(--warn) }
+
+table.matriz td.mx { text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; background: color-mix(in srgb, var(--accent) var(--p), var(--surface)); border-left: 2px solid var(--surface) }
+table.matriz th.r, table.matriz td.r { text-align: center }
+table.matriz tr.tot td { font-weight: 700; border-top: 2px solid var(--line); text-align: center }
+table.matriz tr.tot td:first-child { text-align: left }
+
+#tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; padding: 6px 9px; border-radius: 4px; max-width: 320px; z-index: 10; line-height: 1.35; white-space: pre-line }
+.status-line { font-size: 13px; color: var(--muted) }
+@media (prefers-reduced-motion: no-preference) { .bar .t i, .spark i { transition: width .3s, height .3s } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Mosaic Homes · Marketing</span>
+      <h1>Cockpit de Marketing</h1>
+      <span class="sub">Entregas de marketing semana a semana</span>
+    </div>
+    <div class="controls">
+      <label for="mes">Mês</label>
+      <select id="mes" aria-label="Mês de referência"></select>
+    </div>
+  </header>
+  <div class="tabs" role="tablist" aria-label="Frentes">
+    <button type="button" role="tab" id="tab-marca" data-aba="marca" aria-controls="painel-marca" aria-selected="true">Marca</button>
+    <button type="button" role="tab" id="tab-corretores" data-aba="corretores" aria-controls="painel-corretores" aria-selected="false">Corretores</button>
+  </div>
+  <div id="estado" class="status-line">Carregando as planilhas…</div>
+  <div role="tabpanel" id="painel-marca" aria-labelledby="tab-marca" class="tabpanel"></div>
+  <div role="tabpanel" id="painel-corretores" aria-labelledby="tab-corretores" class="tabpanel" hidden></div>
+
+</div>
+<div id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+/* ---------- Leitura das planilhas de cada fonte ---------- */
+const MESES = ['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MESES_LABEL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const pad2 = n => String(n).padStart(2, '0');
+const isoDe = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const norm = s => (s instanceof Date ? `${pad2(s.getDate())}/${pad2(s.getMonth() + 1)}/${s.getFullYear()}` : String(s ?? '')).replace(/\s+/g, ' ').trim();
+const fold = s => norm(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function csvParse(text, delim) {
+  text = String(text).replace(/^﻿/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const count = ch => first.split(ch).length - 1;
+  let d = delim || ',';
+  if (!delim) { if (count(';') > count(',')) d = ';'; else if (count(',') === 0 && count('\t') > 0) d = '\t'; }
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+    else if (c === '"' && cell === '') q = true;
+    else if (c === d) { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+function num(v) {
+  if (typeof v === 'number') return v;
+  let s = norm(v).replace(/[R$\s%]/g, '');
+  if (!s || s === '-') return 0;
+  if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/,\d+$/.test(s)) s = s.replace(/\./g, '').replace(',', '.');
+  else s = s.replace(/,/g, '');
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+
+/* Data em ISO (AAAA-MM-DD) a partir de Date, "dd/mm/aaaa" ou "aaaa-mm-dd" */
+function dataIso(v) {
+  if (v instanceof Date && !isNaN(v)) return isoDe(v);
+  const s = norm(v);
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if (m) return `${m[3].length === 2 ? '20' + m[3] : m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
+  return null;
+}
+const mesDe = iso => iso ? iso.slice(0, 7) : null;
+
+function codigoImovel(t) { const m = String(t).match(/\bMO\s*-?\s*(\d{3,5})\b/i); return m ? 'MO' + m[1] : null; }
+function perfil(t) {
+  let m = String(t).match(/@([\w.]+)/);
+  if (!m && codigoImovel(t)) m = String(t).replace(/\bMO\s*-?\s*\d{3,5}\b/i, '').replace(/^[\s\-]+/, '').match(/^([a-z0-9._]{4,})$/i);
+  return m ? '@' + m[1].toLowerCase().replace(/\.$/, '') : null;
+}
+function redeDe(label) {
+  const l = fold(label);
+  if (l.includes('insta')) return 'Instagram';
+  if (l.includes('tiktok') || l.includes('short') || l.includes('youtube')) return 'TikTok / Shorts';
+  if (l.includes('linkedin')) return 'LinkedIn';
+  if (l.includes('face')) return 'Facebook';
+  return norm(label);
+}
+function agrupar(frente, itens, mesPadrao) {
+  const por = {};
+  for (const it of itens) { const m = mesDe(it.data) || mesPadrao; (por[m] ||= []).push(it); }
+  return Object.entries(por).map(([mes, itens]) => ({ frente, mes, itens }));
+}
+
+/* Status da peça pela cor de fundo da célula (legenda do calendário):
+   verde = Em produção · amarelo = Agendado · azul = Postado · vermelho = Não postado · sem cor/branco = Sem status */
+function statusDeCor(hex) {
+  const m = String(hex || '').match(/([0-9a-f]{6})$/i); if (!m) return 'Sem status';
+  const n = parseInt(m[1], 16), r = (n >> 16) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  if (d < 0.08) return 'Sem status';                       // branco, cinza ou preto
+  let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360;
+  if (h < 20 || h >= 330) return 'Não postado';
+  if (h < 70) return 'Agendado';
+  if (h < 170) return 'Em produção';
+  if (h < 260) return 'Postado';
+  return 'Sem status';
+}
+
+/* 1. Calendário semanal de posts da marca (uma aba por mês). cores (opcional): matriz com a cor de fundo de cada célula, alinhada a rows */
+function parseSocial(rows, mesPadrao, cores, mesDaAba) {
+  const itens = []; let mesNum = mesDaAba ? +mesPadrao.slice(5, 7) : null, rede = null, datas = [], semana = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i].map(norm);
+    const mesCell = cells.find(c => MESES.includes(fold(c)));
+    if (mesCell) { if (semana > 0) break; if (!mesDaAba) mesNum = MESES.indexOf(fold(mesCell)) + 1; continue; }
+    if (cells.every(c => !c)) { rede = null; continue; }
+    if (fold(cells[0]) === 'data') { datas = cells; semana++; rede = null; continue; }
+    if (cells[0]) { rede = redeDe(cells[0]); if (!['Instagram', 'TikTok / Shorts', 'LinkedIn', 'Facebook'].includes(rede)) rede = null; }
+    if (!rede || !semana) continue;
+    for (let j = 1; j < cells.length; j++) {
+      const v = cells[j], dm = (datas[j] || '').match(/(\d{1,2})\/(\d{1,2})/);
+      if (!v || !dm || /x{3,}/i.test(v)) continue;
+      if (mesNum && +dm[2] !== mesNum) continue;     // dias de outro mês que ficaram no modelo
+      const codigo = codigoImovel(v);
+      const tipo = rede === 'Instagram' ? (/^corte/i.test(v) ? 'Reels (corte)' : codigo ? 'Post de imóvel' : 'Post institucional')
+        : rede === 'TikTok / Shorts' ? 'Vídeo curto' : 'Post LinkedIn';
+      const it = { data: `${mesPadrao.slice(0, 4)}-${pad2(dm[2])}-${pad2(dm[1])}`, rede, tipo, titulo: v.replace(/\s*-\s*$/, '') || v, codigo, perfil: perfil(v) };
+      if (cores) it.status = statusDeCor(cores[i] && cores[i][j]);
+      itens.push(it);
+    }
+  }
+  if (!itens.length) return { erro: 'Não encontrei o calendário. A aba precisa ter linhas "data" com os dias e, abaixo, linhas por rede (Instagram, TikTok e shorts, Linkedin).' };
+  return { cargas: agrupar('social', itens, mesPadrao) };
+}
+
+/* 2. Tráfego pago: aba "Overview IG" (uma coluna por campanha) ou export do Meta Ads com datas */
+function parseTrafego(rows, mesPadrao, hoje) {
+  const lab = rows.map(r => fold(r[0]));
+  const L = k => lab.findIndex(l => l.startsWith(k));
+  if (L('codigo') >= 0 && L('inicio da campanha') >= 0) {
+    const R = { codigo: L('codigo'), titulo: L('titulo'), corretor: L('corretor'), inicio: L('inicio da campanha'), formato: L('formato'), ba: L('brand awareness'),
+      inv: lab.findIndex(l => l === 'investimento'), res: L('resultado'), qual: L('leads qualificados'), ctr: L('ctr'), saude: L('saude'), sug: L('sugest') };
+    const cel = (k, j) => R[k] >= 0 ? norm(rows[R[k]][j]) : '';
+    const ano = (hoje || new Date()).getFullYear();
+    const itens = [];
+    for (let j = 1; j < rows[R.codigo].length; j++) {
+      const codigo = cel('codigo', j); if (!codigo) continue;
+      const sug = cel('sug', j), up = sug.match(/upload\s*(\d{1,2})\/(\d{1,2})/i);
+      const tipo = /^ba/i.test(codigo) ? 'Brand awareness' : codigoImovel(codigo) ? 'Imóvel' : 'Catálogo';
+      itens.push({
+        codigo, titulo: cel('titulo', j).replace(/^-$/, ''), corretor: cel('corretor', j).replace(/^-$/, ''), tipo,
+        inicio: dataIso(cel('inicio', j)) || (up ? `${ano}-${pad2(up[2])}-${pad2(up[1])}` : null),
+        formato: cel('formato', j), investimento: num(cel('inv', j)),
+        leads: tipo === 'Brand awareness' ? 0 : num(cel('res', j)), impressoes: tipo === 'Brand awareness' ? num(cel('res', j)) : 0,
+        qualificados: num(cel('qual', j)), ctr: cel('ctr', j), saude: cel('saude', j), sugestao: sug,
+        estado: /^pausad/i.test(sug) ? 'Pausada' : up ? 'Programada' : 'No ar'
+      });
+    }
+    if (!itens.length) return { erro: 'A aba de overview não tem campanhas preenchidas.' };
+    return { cargas: [{ frente: 'trafego', mes: 'atual', itens }] };
+  }
+  // export do Meta Ads (uma linha por dia/semana e campanha)
+  const t = tabela(rows, ['campanha', 'campaign', 'valor usado', 'spend', 'impress', 'cliques', 'clicks', 'resultado', 'leads', 'date', 'dia', 'inicio dos relatorios']);
+  if (!t) return { erro: 'Formato não reconhecido. Envie a aba "Overview IG" da planilha de campanhas, ou um export do Meta Ads com as colunas Dia/Semana, Campanha, Valor usado, Impressões, Cliques e Resultados.' };
+  const acc = {};
+  for (const o of t) {
+    const campanha = pick(o, ['nome da campanha', 'campanha', 'campaign name', 'campaign', 'adset_name', 'conjunto']);
+    const data = dataIso(pick(o, ['dia', 'date', 'inicio dos relatorios', 'reporting starts', 'semana', 'data']));
+    if (!campanha || !data || /^total/i.test(campanha)) continue;
+    const k = data + '|' + campanha;
+    const a = acc[k] ||= { data, campanha, codigo: codigoImovel(campanha), tipo: /(^|_)ba/i.test(campanha) ? 'Brand awareness' : codigoImovel(campanha) ? 'Imóvel' : 'Outras', investimento: 0, impressoes: 0, cliques: 0, leads: 0 };
+    a.investimento += num(pick(o, ['valor usado', 'spend', 'amount spent', 'investimento', 'gasto']));
+    a.impressoes += num(pick(o, ['impress']));
+    a.cliques += num(pick(o, ['cliques no link', 'cliques', 'clicks']));
+    a.leads += num(pick(o, ['leads', 'resultados', 'results']));
+  }
+  const itens = Object.values(acc);
+  if (!itens.length) return { erro: 'Nenhuma linha com data e campanha encontrada.' };
+  return { cargas: agrupar('meta', itens, mesPadrao) };
+}
+
+function tabela(rows, chaves) {
+  let hi = -1, best = 0;
+  for (let i = 0; i < Math.min(rows.length, 15); i++) {
+    const f = rows[i].map(fold);
+    const score = chaves.filter(k => f.some(c => c && c.includes(k))).length;
+    if (score > best) { best = score; hi = i; }
+  }
+  if (hi < 0 || best < 3) return null;
+  const head = rows[hi].map(fold);
+  return rows.slice(hi + 1).filter(r => r.some(c => norm(c))).map(r => { const o = {}; head.forEach((h, i) => { if (h && !(h in o)) o[h] = r[i]; }); return o; });
+}
+function pick(o, syn) {
+  for (const s of syn) if (s in o && norm(o[s])) return o[s];
+  for (const s of syn) { const k = Object.keys(o).find(k => k.includes(s) && norm(o[k])); if (k) return o[k]; }
+  return '';
+}
+
+/* 3. Trello: cartões com a etiqueta Marca */
+function categoriaEntrega(t) {
+  const f = fold(t);
+  if (/^\[yt\]|youtube/.test(f)) return 'YouTube';
+  if (/^\[linkedin\]/.test(f)) return 'LinkedIn';
+  if (/^\[ig/.test(f)) return 'Instagram';
+  if (/blog/.test(f)) return 'Blog';
+  if (/open house/.test(f)) return 'Open House';
+  if (/gestao|exclusiv/.test(f) && /material|mo\d/.test(f)) return 'Gestão exclusiva';
+  if (/parceir/.test(f)) return 'Parceiros';
+  if (/video|grava|bastidor|estudio|academy/.test(f)) return 'Vídeo e gravação';
+  return 'Gestão e operação';
+}
+function etapaTrello(lista, c) {
+  const f = fold(lista);
+  if ((c && c.dueComplete) || /conclu|feito|entregue|done|finaliz/.test(f)) return 'Concluída';
+  if (/hold|pausad/.test(f)) return 'Em espera';
+  if (/revis|aprova/.test(f)) return 'Em revisão';
+  if (/andamento|fazendo|produc/.test(f)) return 'Em andamento';
+  return 'A fazer';
+}
+function parseEntregasTrello(json, mesPadrao) {
+  const listas = Object.fromEntries((json.lists || []).map(l => [l.id, l.name]));
+  const itens = (json.cards || []).filter(c => !c.closed && (c.labels || []).some(l => fold(l.name) === 'marca')).map(c => {
+    const d = c.due || c.start || new Date(parseInt(c.id.slice(0, 8), 16) * 1000).toISOString();
+    const lista = listas[c.idList] || '';
+    return { data: dataIso(new Date(d)), titulo: norm(c.name), categoria: categoriaEntrega(c.name), lista, etapa: etapaTrello(lista, c) };
+  });
+  if (!itens.length) return { erro: 'Nenhum cartão ativo com a etiqueta "Marca" no arquivo do Trello.' };
+  return { cargas: agrupar('entregas', itens, mesPadrao) };
+}
+
+/* 4. Planejamento de mídias dos corretores: abas de planejamento (Data, Corretor, Instagram/Status...) e aba de publicados (links) */
+const A64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+function dataDoLinkInstagram(url) {
+  const m = String(url).match(/instagram\.com\/(?:[\w.]+\/)?(?:p|reel|reels|tv)\/([A-Za-z0-9_-]{11})/);
+  if (!m) return null;
+  let n = 0n; for (const ch of m[1]) n = n * 64n + BigInt(A64.indexOf(ch));
+  const ms = Number(n >> 23n) + 1314220021721;       // o ID da publicação carrega o horário de publicação
+  const d = new Date(ms - 3 * 3600e3);                 // horário de Brasília
+  return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+}
+function etapaCorretor(s) {
+  const f = fold(s);
+  if (!f || f === 'a fazer') return 'Planejado';
+  if (/reprovad|barrad|vetad|recusad/.test(f)) return 'Reprovado';
+  if (/^aprovad/.test(f)) return 'Aprovado';
+  if (/publicad|postad/.test(f)) return 'Publicado';
+  if (/a aprovar|enviad/.test(f)) return 'Em aprovação';
+  return 'Em produção';
+}
+function parseCorretores(abas, mesPadrao) {
+  const plan = [], pub = [];
+  for (const { rows } of abas) {
+    let hi = rows.findIndex(r => { const f = r.map(fold); return f.includes('data') && f.includes('corretor'); });
+    if (hi >= 0) {
+      const h = rows[hi].map(fold), ci = h.indexOf('corretor'), di = h.indexOf('data'), lk = h.indexOf('link');
+      const redes = ['instagram', 'tiktok', 'linkedin'].map(k => ({ k, i: h.findIndex(x => x.startsWith(k)) })).filter(x => x.i >= 0);
+      for (const r of rows.slice(hi + 1)) {
+        const data = dataIso(r[di]), corretor = norm(r[ci]), lv = lk >= 0 ? norm(r[lk]) : '', link = /^https?:\/\//i.test(lv) ? lv : '';
+        if (!data || !corretor) continue;
+        for (const { k, i } of redes) {
+          const q = norm(r[i]); if (!q) continue;
+          const n = Math.max(1, Math.round(num(q)) || 1);
+          const st = fold(h[i + 1]) === 'status' ? norm(r[i + 1]) : '';
+          for (let x = 0; x < n; x++) plan.push({ data, corretor, rede: k === 'instagram' ? 'Instagram' : k === 'tiktok' ? 'TikTok' : 'LinkedIn', etapa: etapaCorretor(st), status: st, ...(link ? { link } : {}) });
+        }
+      }
+      continue;
+    }
+    for (const r of rows) {
+      const cells = r.map(norm), li = cells.findIndex(c => /instagram\.com\//.test(c));
+      if (li < 0) continue;
+      const corretor = cells.find((c, i) => i !== li && c && !/^https?:/.test(c) && !/^\d/.test(c));
+      if (!corretor) continue;
+      pub.push({ data: dataDoLinkInstagram(cells[li]), corretor, rede: 'Instagram', link: cells[li] });
+    }
+  }
+  // bloco "Vídeos prontos para postar": "Nome:" seguido de linhas "N vídeos (link)"
+  const prontos = {};
+  for (const { rows } of abas) {
+    let ativo = false, atual = null;
+    for (const r of rows) {
+      const c = norm(r[0]); if (!c) continue;
+      if (/^v[ií]deos prontos/i.test(c)) { ativo = true; continue; }
+      if (!ativo) continue;
+      const nome = c.match(/^([^\d:]+):$/);
+      if (nome) { atual = nome[1].trim(); prontos[atual] = prontos[atual] || 0; continue; }
+      const q = c.match(/^(\d+)\s*v[ií]deos?\b/i);
+      if (q && atual) prontos[atual] += +q[1];
+    }
+  }
+  const cargasProntos = Object.keys(prontos).length ? [{ frente: 'cprontos', mes: 'atual', itens: Object.entries(prontos).map(([corretor, videos]) => ({ corretor, videos })) }] : [];
+  if (!plan.length && !pub.length && !cargasProntos.length) return { erro: 'Não encontrei o planejamento (colunas Data, Corretor, Instagram, TikTok, LinkedIn) nem links de publicações do Instagram.' };
+  return { cargas: [...agrupar('cplan', plan, mesPadrao), ...agrupar('cpub', pub.filter(p => p.data), mesPadrao), ...cargasProntos] };
+}
+
+if (typeof module !== 'undefined') module.exports = { csvParse, parseSocial, statusDeCor, parseTrafego, parseEntregasTrello, parseCorretores, dataDoLinkInstagram, num };
+
+</script>
+<script>
+/* ---------- Configuração ---------- */
+const FONTES = {
+  social: { nome: 'Social media orgânico', aba: 'marca' },
+  trafego: { nome: 'Tráfego pago · campanhas', aba: 'marca' },
+  meta: { nome: 'Tráfego pago · Meta Ads semanal', aba: 'marca' },
+  entregas: { nome: 'Outras entregas (Trello)', aba: 'marca' },
+  cplan: { nome: 'Corretores · planejamento', aba: 'corretores' },
+  cpub: { nome: 'Corretores · publicados', aba: 'corretores' },
+  cprontos: { nome: 'Corretores · vídeos prontos', aba: 'corretores' }
+};
+const COR = {
+  rede: { 'Instagram': 'var(--s1)', 'TikTok / Shorts': 'var(--s2)', 'TikTok': 'var(--s2)', 'LinkedIn': 'var(--s3)', 'Facebook': 'var(--s4)' },
+  tipo: { 'Imóvel': 'var(--s1)', 'Brand awareness': 'var(--s2)', 'Catálogo': 'var(--s3)', 'Outras': 'var(--s4)' },
+  etapaC: { 'Publicado': 'var(--accent)', 'Aprovado': 'var(--good)', 'Em aprovação': 'var(--s2)', 'Em produção': 'var(--s3)', 'Planejado': 'var(--neutral)', 'Reprovado': 'var(--crit)' },
+  etapaE: { 'Concluída': 'var(--good)', 'Em revisão': 'var(--s2)', 'Em andamento': 'var(--s3)', 'A fazer': 'var(--neutral)', 'Em espera': 'var(--warn)' },
+  estado: { 'No ar': 'var(--good)', 'Programada': 'var(--s2)', 'Pausada': 'var(--neutral)' },
+  status: { 'Postado': 'var(--s2)', 'Agendado': 'var(--warn)', 'Em produção': 'var(--good)', 'Não postado': 'var(--crit)', 'Sem status': 'var(--neutral)' }
+};
+const ORD = {
+  rede: ['Instagram', 'TikTok / Shorts', 'LinkedIn', 'Facebook'], redeC: ['Instagram', 'TikTok', 'LinkedIn'],
+  tipo: ['Imóvel', 'Brand awareness', 'Catálogo', 'Outras'],
+  etapaC: ['Publicado', 'Aprovado', 'Em aprovação', 'Em produção', 'Planejado', 'Reprovado'],
+  etapaE: ['Concluída', 'Em revisão', 'Em andamento', 'A fazer', 'Em espera'],
+  estado: ['No ar', 'Programada', 'Pausada'],
+  status: ['Postado', 'Agendado', 'Em produção', 'Não postado', 'Sem status']
+};
+/* Cor de fundo de cada célula da aba, alinhada às linhas de sheet_to_json({ header: 1 }) */
+function coresDaAba(ws) {
+  if (!ws || !ws['!ref']) return null;
+  const r = XLSX.utils.decode_range(ws['!ref']), out = [];
+  for (let R = r.s.r; R <= r.e.r; R++) {
+    const linha = [];
+    for (let C = r.s.c; C <= r.e.c; C++) { const c = ws[XLSX.utils.encode_cell({ r: R, c: C })], f = c && c.s && c.s.fgColor; linha.push(f && f.rgb && (!c.s.patternType || c.s.patternType === 'solid') ? f.rgb : ''); }
+    out.push(linha);
+  }
+  return out;
+}
+
+const state = { syncMsg: '', syncMsgSocial: '', syncMsgCorr: '', segs: [], editSeg: false, subTraf: 'imoveis', cargas: {}, fotos: {}, assets: null, mes: null, aba: 'marca', db: null, podeEditar: false, parsed: null, wb: null, rowsFonte: null, json: null, nomeArq: '' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = n => Number(n || 0).toLocaleString('pt-BR');
+const brl = n => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+const mesLabel = m => { const [y, mm] = m.split('-'); return MESES_LABEL[+mm - 1] + ' ' + y; };
+const mesAbrev = m => MESES_LABEL[+m.split('-')[1] - 1].slice(0, 3).toLowerCase();
+const dataBr = iso => iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) : '';
+const HOJE = new Date(); const MES_ATUAL = HOJE.getFullYear() + '-' + pad2(HOJE.getMonth() + 1); const HOJE_ISO = isoDe(HOJE);
+const carga = (f, m) => state.cargas[f + '__' + m];
+const itensDe = (f, m) => carga(f, m)?.itens || [];
+const countBy = (arr, fn) => { const o = {}; arr.forEach(i => { const v = fn(i); if (v != null && v !== '') o[v] = (o[v] || 0) + 1; }); return o; };
+const sum = (arr, k) => arr.reduce((a, i) => a + (Number(i[k]) || 0), 0);
+const sorted = o => Object.entries(o).sort((a, b) => b[1] - a[1]);
+const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '–';
+
+/* Semanas de domingo a sábado, recortadas no mês */
+function semanas(m) {
+  const [y, mo] = m.split('-').map(Number), first = new Date(y, mo - 1, 1), last = new Date(y, mo, 0);
+  const out = []; let s = new Date(y, mo - 1, 1 - first.getDay());
+  while (s <= last) {
+    const e = new Date(s); e.setDate(e.getDate() + 6);
+    const ini = s < first ? first : s, fim = e > last ? last : e;
+    const a = isoDe(ini), b = isoDe(fim);
+    out.push({ ini: a, fim: b, nome: `${a.slice(8)}–${b.slice(8)} ${mesAbrev(m)}`, atual: HOJE_ISO >= a && HOJE_ISO <= b });
+    s = new Date(s); s.setDate(s.getDate() + 7);
+  }
+  return out;
+}
+const semanaDe = (ws, iso) => ws.findIndex(w => iso >= w.ini && iso <= w.fim);
+function porSemana(itens, m, chave, dataDe = i => i.data) {
+  const ws = semanas(m);
+  return ws.map(w => ({ ...w, valores: countBy(itens.filter(i => { const d = dataDe(i); return d && d >= w.ini && d <= w.fim; }), chave) }));
+}
+
+function meses() {
+  const s = new Set(Object.values(state.cargas).map(c => c.mes).filter(m => /^\d{4}-\d{2}$/.test(m)));
+  s.add(MES_ATUAL);
+  return [...s].sort().reverse();
+}
+
+/* ---------- Componentes ---------- */
+const kpi = (v, l, sub = '') => `<div class="card c3 kpi"><span class="v num">${v}</span><span class="l">${l}</span>${sub ? `<span class="note">${sub}</span>` : ''}</div>`;
+const legend = (ordem, cores, presentes) => `<div class="legend">${ordem.filter(n => !presentes || presentes.has(n)).map(n => `<span><b style="background:${cores[n]}"></b>${esc(n)}</span>`).join('')}</div>`;
+function bars(entries, opts = {}) {
+  const max = Math.max(1, ...entries.map(e => e.total));
+  return `<div class="bars">${entries.map(e => {
+    const segs = e.segs || [{ v: e.total, cor: e.cor || opts.cor || 'var(--accent)' }];
+    return `<div class="bar" data-tip="${esc(e.tip || `${e.nome}: ${opts.fmt ? opts.fmt(e.total) : fmt(e.total)}`)}"><span class="n" title="${esc(e.nome)}">${esc(e.nome)}</span>
+      <span class="t" style="width:${e.total / max * 100}%">${segs.filter(s => s.v).map(s => `<i style="flex:${s.v};background:${s.cor}"></i>`).join('')}</span>
+      <span class="v">${opts.fmt ? opts.fmt(e.total) : fmt(e.total)}</span></div>`;
+  }).join('')}</div>`;
+}
+function colunas(grupos, ordem, cores, { fmtV = fmt, aria = '', W = 520, H = 220, tipExtra = null } = {}) {
+  const series = ordem.filter(s => grupos.some(g => g.valores[s]));
+  const L = 34, B = 30, T = 20, R = 6;
+  const tot = grupos.map(g => series.reduce((a, s) => a + (g.valores[s] || 0), 0));
+  const maxT = Math.max(...tot, 0);
+  const raw = maxT / 4 || 1, mag = Math.pow(10, Math.floor(Math.log10(raw))), step = [1, 2, 2.5, 5, 10].map(x => x * mag).find(x => x >= raw);
+  const top = Math.max(step, Math.ceil(maxT / step) * step);
+  const y = v => T + (H - T - B) * (1 - v / top);
+  const slot = (W - L - R) / grupos.length, bw = Math.min(54, slot * 0.58);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(aria)}">`;
+  for (let v = 0; v <= top + 1e-9; v += step) s += `<line class="grid-l" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${fmtV(v)}</text>`;
+  grupos.forEach((g, i) => {
+    const cx = L + slot * (i + 0.5), x = cx - bw / 2;
+    if (g.atual) s += `<rect x="${cx - slot / 2 + 2}" y="${T - 14}" width="${slot - 4}" height="${H - T - B + 14}" class="cur-w"/>`;
+    let acc = 0; const vis = series.filter(se => g.valores[se]);
+    vis.forEach((se, k) => {
+      const v = g.valores[se], y0 = y(acc), y1 = y(acc + v); acc += v;
+      const h = Math.max(1, y0 - y1 - (k ? 2 : 0)), tip = `${g.nome} · ${se}: ${fmtV(v)}` + (tipExtra ? tipExtra(g, se) : '');
+      s += k === vis.length - 1 && h > 5
+        ? `<path d="M${x},${y1 + h} V${y1 + 4} Q${x},${y1} ${x + 4},${y1} H${x + bw - 4} Q${x + bw},${y1} ${x + bw},${y1 + 4} V${y1 + h} Z" fill="${cores[se]}" data-tip="${esc(tip)}"/>`
+        : `<rect x="${x}" y="${y1}" width="${bw}" height="${h}" fill="${cores[se]}" data-tip="${esc(tip)}"/>`;
+    });
+    s += `<text class="tot" x="${cx}" y="${y(tot[i]) - 6}" text-anchor="middle">${tot[i] ? fmtV(tot[i]) : ''}</text><text x="${cx}" y="${H - 10}" text-anchor="middle"${g.atual ? ' class="tot"' : ''}>${esc(g.nome)}</text>`;
+  });
+  return s + '</svg>';
+}
+function vazio(titulo) {
+  return `<div class="empty"><strong>${esc(titulo)}</strong><span>Confira se a planilha está publicada e preenchida.</span></div>`;
+}
+function fonteTxt(...fs) {
+  const cs = fs.map(f => typeof f === 'string' ? null : f).filter(Boolean);
+  if (!cs.length) return '';
+  const c = cs.sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm))[0];
+  return `Fonte: ${esc(c.arquivo || 'planilha')} · atualizado em ${new Date(c.atualizadoEm).toLocaleDateString('pt-BR')}`;
+}
+const secHead = (t, src = '') => `<div class="panel-head"><h2>${t}</h2><span class="src">${src}</span></div>`;
+
+/* ---------- Render ---------- */
+function render() {
+  const ms = meses();
+  if (!state.mes || !ms.includes(state.mes)) {
+    const com = ms.filter(m => Object.keys(FONTES).some(f => carga(f, m)));
+    state.mes = com.includes(MES_ATUAL) ? MES_ATUAL : (com[0] || MES_ATUAL);
+  }
+  $('mes').innerHTML = ms.map(m => `<option value="${m}"${m === state.mes ? ' selected' : ''}>${mesLabel(m)}</option>`).join('');
+  document.querySelectorAll('[role=tab]').forEach(t => { const on = t.dataset.aba === state.aba; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; });
+  $('painel-marca').hidden = state.aba !== 'marca'; $('painel-corretores').hidden = state.aba !== 'corretores';
+  if (state.aba === 'marca') renderMarca(); else renderCorretores();
+}
+
+function renderMarca() {
+  const m = state.mes;
+  const social = itensDe('social', m), ent = itensDe('entregas', m), camp = itensDe('trafego', 'atual');
+  const snap = carga('trafego', 'atual');
+  const noAr = camp.filter(c => c.estado === 'No ar');
+  const aIniciar = camp.filter(c => c.estado === 'Programada' && c.inicio && c.inicio.slice(0, 7) === m);
+  const redes = countBy(social, i => i.rede), stM = countBy(social, i => i.status || 'Sem status');
+  const mesNome = MESES_LABEL[+m.split('-')[1] - 1].toLowerCase();
+
+  let h = `<div class="grid">
+    ${kpi(carga('social', m) ? fmt(social.length) : '–', 'peças orgânicas programadas', carga('social', m) ? `${fmt(redes['Instagram'] || 0)} no Instagram, ${fmt(redes['TikTok / Shorts'] || 0)} no TikTok, ${fmt(redes['LinkedIn'] || 0)} no LinkedIn` + (social.some(i => i.status) ? '<br>' + ORD.status.filter(s => stM[s]).map(s => `${fmt(stM[s])} ${s.toLowerCase()}`).join(' · ') : '') : 'sem calendário do mês')}
+    ${kpi(snap ? fmt(noAr.length) : '–', 'campanhas de tráfego no ar', snap ? `${fmt(noAr.filter(c => c.tipo !== 'Brand awareness').length)} de imóveis, ${fmt(noAr.filter(c => c.tipo === 'Brand awareness').length)} de brand awareness` : 'sem planilha de campanhas')}
+    ${kpi(snap ? fmt(aIniciar.length) : '–', `a iniciar em ${mesNome}`, snap ? (aIniciar.length ? aIniciar.map(c => c.codigo).join(', ') : 'nenhuma campanha programada') : '')}
+  </div>`.replace(/card c3 kpi/g, 'card c4 kpi');
+  h += audiencia(m);
+
+  // Social orgânico
+  h += `<section class="panel">${secHead('Social media orgânico', fonteTxt(carga('social', m)))}`;
+  if (state.syncMsgSocial) h += `<p class="note warn-note">${esc(state.syncMsgSocial)}</p>`;
+  if (!social.length) h += vazio(`Sem calendário de posts para ${mesLabel(m)}.`, 'Envie a aba do mês do calendário de posts (Interno – Calendário/Cronograma).', 'social');
+  else {
+    h += `<div class="card"><h3>Peças por semana</h3>${legend(ORD.rede, COR.rede, new Set(social.map(i => i.rede)))}${colunas(porSemana(social, m, i => i.rede), ORD.rede, COR.rede, { aria: 'Peças orgânicas por semana, por rede', W: 900, H: 240 })}</div>`;
+    const comStatus = social.filter(i => i.status);
+    if (comStatus.length) {
+      const st = countBy(comStatus, i => i.status), presS = new Set(comStatus.map(i => i.status));
+      const naoPost = comStatus.filter(i => i.status === 'Não postado').sort((a, b) => a.data.localeCompare(b.data));
+      h += `<div class="grid">
+        <div class="card c7"><h3>Status por semana</h3>${legend(ORD.status, COR.status, presS)}${colunas(porSemana(comStatus, m, i => i.status), ORD.status, COR.status, { aria: 'Peças orgânicas por semana, por status' })}</div>
+        <div class="card c5"><h3>Status no mês</h3>${bars(ORD.status.filter(s => st[s]).map(s => ({ nome: s, total: st[s], cor: COR.status[s] })))}
+          <p class="note">${pct(st['Postado'] || 0, comStatus.length)} das peças do mês já postadas. Status pela cor da célula no calendário.</p>
+          ${naoPost.length ? `<div class="tbl"><table><thead><tr><th>Data</th><th>Não postado</th><th>Rede</th></tr></thead><tbody>${naoPost.map(i => `<tr><td class="num">${dataBr(i.data)}</td><td>${esc(i.titulo)}</td><td>${esc(i.rede)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+        </div>
+      </div>`;
+    }
+    h += pecasDoMes(social, m);
+  }
+  h += `</section>`;
+
+  // Tráfego pago: retrato da situação atual
+  h += `<section class="panel">${secHead('Tráfego pago', snap ? `Situação em ${new Date(snap.atualizadoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })} · ${esc(snap.arquivo)}` : '')}`;
+  if (state.syncMsg) h += `<p class="note warn-note">${esc(state.syncMsg)}</p>`;
+  if (!snap) h += vazio('Sem dados de campanhas.', 'Envie a aba "Overview IG" da planilha Overview – Campanhas (CSV ou XLSX). MO… = imóvel; BAws… = brand awareness.', 'trafego');
+  else {
+    const grupos = { imoveis: camp.filter(c => c.tipo !== 'Brand awareness'), ba: camp.filter(c => c.tipo === 'Brand awareness') };
+    const lista = grupos[state.subTraf] || [];
+    const ordem = (a, b) => ORD.estado.indexOf(a.estado) - ORD.estado.indexOf(b.estado) || (b.inicio || '').localeCompare(a.inicio || '');
+    const ativas = lista.filter(c => c.estado !== 'Pausada').sort(ordem), pausadas = lista.filter(c => c.estado === 'Pausada').sort(ordem);
+    const resumo = arr => ORD.estado.map(e => [e, arr.filter(c => c.estado === e).length]).filter(x => x[1]).map(([e, n]) => `${n} ${e === 'No ar' ? 'no ar' : e === 'Programada' ? (n > 1 ? 'programadas' : 'programada') : (n > 1 ? 'pausadas' : 'pausada')}`).join(' · ');
+    h += `<div class="subtabs" role="tablist" aria-label="Tipo de campanha">
+        ${[['imoveis', 'Imóveis'], ['ba', 'Brand awareness']].map(([k, n]) => `<button type="button" role="tab" data-sub="${k}" aria-selected="${state.subTraf === k}">${n} <span class="count">${grupos[k].filter(c => c.estado !== 'Pausada').length}</span></button>`).join('')}
+      </div>
+      <p class="note">${resumo(lista) || 'Nenhuma campanha.'} · investimento e leads acumulados desde o início de cada campanha</p>
+      ${ativas.length ? `<div class="camps">${ativas.map(c => cardCampanha(c, c.estado === 'Programada')).join('')}</div>` : '<p class="note">Nenhuma campanha no ar ou programada.</p>'}
+      ${pausadas.length ? `<details class="paus"><summary>${pausadas.length} ${pausadas.length > 1 ? 'campanhas pausadas' : 'campanha pausada'}</summary><div class="camps sm">${pausadas.map(c => cardCampanha(c, false)).join('')}</div></details>` : ''}
+      ${state.assets ? '<p class="note">Use “Adicionar foto” em cada campanha; a foto fica guardada pelo código e vale para os próximos meses.</p>' : ''}`;
+  }
+  h += `</section>`;
+
+  $('painel-marca').innerHTML = h;
+}
+
+
+/* Lista de peças orgânicas por semana, com o status de cada uma (cor da célula no calendário) */
+function pecasDoMes(social, m) {
+  const ws = semanas(m), ordR = r => ORD.rede.indexOf(r);
+  const blocos = ws.map(w => {
+    const its = social.filter(i => i.data >= w.ini && i.data <= w.fim).sort((a, b) => a.data.localeCompare(b.data) || ordR(a.rede) - ordR(b.rede));
+    if (!its.length) return '';
+    const st = countBy(its, i => i.status || 'Sem status');
+    return `<details class="sem"${w.atual ? ' open' : ''}><summary><span>${esc(w.nome)}${w.atual ? ' · semana atual' : ''}</span><span class="note">${fmt(its.length)} peças · ${ORD.status.filter(s => st[s]).map(s => `${st[s]} ${s.toLowerCase()}`).join(' · ')}</span></summary>
+      <div class="tbl"><table><thead><tr><th>Data</th><th>Peça</th><th>Rede</th><th>Status</th></tr></thead><tbody>${its.map(i => { const s = i.status || 'Sem status'; return `<tr><td class="num">${dataBr(i.data)}</td><td>${esc(i.titulo)}</td><td>${esc(i.rede)}</td><td><span class="st" style="--c:${COR.status[s]}">${esc(s)}</span></td></tr>`; }).join('')}</tbody></table></div></details>`;
+  }).join('');
+  return blocos ? `<div class="card"><h3>Status de cada peça</h3>${legend(ORD.status, COR.status, new Set(social.map(i => i.status || 'Sem status')))}${blocos}</div>` : '';
+}
+
+/* ---------- Audiência (seguidores) ----------
+   Guardada pela função do Netlify (netlify/functions/audiencia.mjs, Netlify Blobs), visível para todos.
+   Se a função não responder (arquivo aberto no computador, por exemplo), guarda só neste navegador. */
+const AUD_API = '/.netlify/functions/audiencia';
+const AUD_LOCAL = 'cockpit-audiencia';
+const AUD_REDES = [['instagram', 'Instagram'], ['youtube', 'YouTube']];
+const aud = { hist: [], modo: 'carregando', protegido: false, editando: false, salvando: false, msg: '', rascunho: null };
+const lerLocal = () => { try { return JSON.parse(localStorage.getItem(AUD_LOCAL) || '[]'); } catch { return []; } };
+const gravarLocal = h => { try { localStorage.setItem(AUD_LOCAL, JSON.stringify(h)); } catch { } };
+const senhaAud = () => { try { return localStorage.getItem(AUD_LOCAL + '-senha') || ''; } catch { return ''; } };
+const ordenarAud = h => h.filter(r => r && r.data).sort((a, b) => a.data.localeCompare(b.data));
+
+async function carregarAudiencia() {
+  try {
+    const r = await fetch(AUD_API, { cache: 'no-store' });
+    const ct = r.headers.get('content-type') || '';
+    if (!r.ok || !ct.includes('json')) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    aud.hist = ordenarAud(j.historico || []); aud.protegido = !!j.protegido; aud.modo = 'netlify';
+  } catch (e) { aud.hist = ordenarAud(lerLocal()); aud.modo = 'local'; }
+}
+
+async function enviarAud(metodo, corpo, query = '') {
+  if (aud.modo === 'local') {
+    let h = lerLocal();
+    if (metodo === 'POST') { h = h.filter(r => r.data !== corpo.data); h.push({ ...corpo, em: new Date().toISOString() }); }
+    else h = h.filter(r => r.data !== query);
+    gravarLocal(ordenarAud(h)); return ordenarAud(h);
+  }
+  const r = await fetch(AUD_API + (query ? '?data=' + encodeURIComponent(query) : ''), {
+    method: metodo, headers: { 'Content-Type': 'application/json', 'x-senha': senhaAud() }, body: corpo ? JSON.stringify(corpo) : undefined
+  });
+  if (r.status === 401) { try { localStorage.removeItem(AUD_LOCAL + '-senha'); } catch { } throw new Error('senha'); }
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return ordenarAud((await r.json()).historico || []);
+}
+
+/* Valor de referência do mês escolhido: último registro até o fim do mês; variação contra o último registro antes do mês */
+function audResumo(rede, m) {
+  const fim = m + '-31', ini = m + '-01';
+  const com = aud.hist.filter(r => Number.isFinite(r[rede]));
+  const ref = [...com].reverse().find(r => r.data <= fim);
+  const base = [...com].reverse().find(r => r.data < ini);
+  return { ref, base, serie: com.filter(r => r.data <= fim).slice(-12) };
+}
+
+function audiencia(m) {
+  const temAlgum = aud.hist.length > 0;
+  const ultimo = aud.hist[aud.hist.length - 1];
+  let h = `<section class="panel">${secHead('Audiência', ultimo ? `Último registro em ${new Date(ultimo.data + 'T12:00').toLocaleDateString('pt-BR')}` : '')}`;
+  if (aud.modo === 'carregando') return h + '<p class="note">Carregando os números de seguidores…</p></section>';
+  if (aud.modo === 'local') h += '<p class="note warn-note">A função do Netlify não respondeu, então os números ficam guardados só neste navegador. Depois de publicar no Netlify com a pasta netlify/functions, eles passam a valer para todos.</p>';
+
+  if (!aud.editando) {
+    if (!temAlgum) h += `<div class="empty"><strong>Nenhum número de seguidores registrado ainda.</strong><span>Registre os seguidores do Instagram e do YouTube; a cada atualização o cockpit mostra quanto cresceu.</span><button type="button" class="btn" data-aud="editar">Registrar seguidores</button></div>`;
+    else {
+      h += '<div class="aud-grid">' + AUD_REDES.map(([k, nome]) => {
+        const { ref, base, serie } = audResumo(k, m);
+        if (!ref) return `<div class="card aud"><span class="aud-net">${nome}</span><span class="note">Sem registro até ${mesLabel(m).toLowerCase()}.</span></div>`;
+        const d = base ? ref[k] - base[k] : null;
+        const cls = d == null ? '' : d > 0 ? 'up' : d < 0 ? 'down' : 'flat';
+        const dTxt = d == null ? 'primeiro registro' : `${d > 0 ? '+' : ''}${fmt(d)} em ${mesLabel(m).toLowerCase().split(' ')[0]}`;
+        const mx = Math.max(...serie.map(r => r[k])), mn = Math.min(...serie.map(r => r[k]));
+        const spark = serie.length > 1 ? `<div class="spark" aria-hidden="true">${serie.map((r, i) => `<i${i === serie.length - 1 ? ' class="cur"' : ''} style="height:${mx === mn ? 60 : Math.round(20 + (r[k] - mn) / (mx - mn) * 80)}%" data-tip="${esc(dataBr(r.data) + '/' + r.data.slice(2, 4) + ': ' + fmt(r[k]) + (k === 'youtube' ? ' inscritos' : ' seguidores'))}"></i>`).join('')}</div>` : '';
+        return `<div class="card aud"><span class="aud-net">${nome}</span>
+          <div class="aud-v"><span class="v num">${fmt(ref[k])}</span><span class="l">${k === 'youtube' ? 'inscritos' : 'seguidores'}</span></div>
+          <span class="delta ${cls}">${dTxt}</span>${spark}
+          <span class="note">em ${dataBr(ref.data)}/${ref.data.slice(2, 4)}</span></div>`;
+      }).join('') + '</div>';
+      h += `<div class="row"><button type="button" class="btn" data-aud="editar">Editar seguidores</button>${aud.msg ? `<span class="note">${esc(aud.msg)}</span>` : ''}</div>`;
+      h += `<details class="aud-hist"><summary>Histórico (${aud.hist.length} ${aud.hist.length > 1 ? 'registros' : 'registro'})</summary><div class="tbl"><table><thead><tr><th>Data</th><th class="r">Instagram</th><th class="r">YouTube</th><th></th></tr></thead><tbody>
+        ${[...aud.hist].reverse().map(r => `<tr><td class="num">${dataBr(r.data)}/${r.data.slice(2, 4)}</td><td class="r">${Number.isFinite(r.instagram) ? fmt(r.instagram) : '–'}</td><td class="r">${Number.isFinite(r.youtube) ? fmt(r.youtube) : '–'}</td><td class="r"><button type="button" class="linkbtn" data-aud="apagar" data-data="${esc(r.data)}">Apagar</button></td></tr>`).join('')}
+      </tbody></table></div></details>`;
+    }
+    return h + '</section>';
+  }
+
+  const rz = aud.rascunho;
+  const pedeSenha = aud.modo === 'netlify' && aud.protegido && !senhaAud();
+  h += `<div class="card"><h3>Atualizar seguidores</h3>
+    <div class="aud-form">
+      <label>Data do número<input type="date" data-rz="data" value="${esc(rz.data)}" max="${HOJE_ISO}"></label>
+      <label>Seguidores no Instagram<input type="text" inputmode="numeric" data-rz="instagram" value="${esc(rz.instagram)}" placeholder="ex.: 12.480"></label>
+      <label>Inscritos no YouTube<input type="text" inputmode="numeric" data-rz="youtube" value="${esc(rz.youtube)}" placeholder="ex.: 1.350"></label>
+      ${pedeSenha ? `<label>Senha de edição<input type="password" data-rz="senha" value="${esc(rz.senha || '')}" autocomplete="current-password"></label>` : ''}
+    </div>
+    <div class="row"><button type="button" class="btn" data-aud="salvar"${aud.salvando ? ' disabled' : ''}>${aud.salvando ? 'Salvando…' : 'Salvar'}</button><button type="button" class="btn ghost" data-aud="cancelar">Cancelar</button>${aud.msg ? `<span class="note warn-note">${esc(aud.msg)}</span>` : ''}</div>
+    <p class="note">Se já existir um registro na mesma data, ele é substituído. Deixe em branco a rede que não quiser atualizar.</p>
+  </div></section>`;
+  return h;
+}
+
+document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.rz; if (k && aud.rascunho) aud.rascunho[k] = e.target.value; });
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-aud]'); if (!b) return;
+  const acao = b.dataset.aud;
+  if (acao === 'editar') {
+    const u = aud.hist[aud.hist.length - 1] || {};
+    aud.rascunho = { data: HOJE_ISO, instagram: u.instagram != null ? fmt(u.instagram) : '', youtube: u.youtube != null ? fmt(u.youtube) : '', senha: '' };
+    aud.editando = true; aud.msg = ''; render();
+    const i = document.querySelector('[data-rz="instagram"]'); if (i) { i.focus(); i.select(); }
+  } else if (acao === 'cancelar') { aud.editando = false; aud.msg = ''; render(); }
+  else if (acao === 'salvar') {
+    const rz = aud.rascunho, inteiro = v => { const s = String(v || '').replace(/\D/g, ''); return s ? parseInt(s, 10) : null; };
+    const corpo = { data: rz.data, instagram: inteiro(rz.instagram), youtube: inteiro(rz.youtube) };
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(corpo.data || '')) { aud.msg = 'Escolha a data do número.'; render(); return; }
+    if (corpo.instagram == null && corpo.youtube == null) { aud.msg = 'Preencha pelo menos uma das redes.'; render(); return; }
+    const anterior = aud.hist.find(r => r.data === corpo.data) || {};
+    if (corpo.instagram == null) corpo.instagram = anterior.instagram ?? null;
+    if (corpo.youtube == null) corpo.youtube = anterior.youtube ?? null;
+    if (rz.senha) try { localStorage.setItem(AUD_LOCAL + '-senha', rz.senha); } catch { }
+    aud.salvando = true; aud.msg = ''; render();
+    try { aud.hist = await enviarAud('POST', corpo); aud.editando = false; aud.msg = 'Seguidores atualizados.'; }
+    catch (err) { aud.msg = err.message === 'senha' ? 'Senha de edição incorreta.' : 'Não consegui salvar agora. Tente de novo em instantes.'; }
+    aud.salvando = false; render();
+  } else if (acao === 'apagar') {
+    const d = b.dataset.data;
+    if (!confirm(`Apagar o registro de ${dataBr(d)}/${d.slice(2, 4)}? Isso não pode ser desfeito.`)) return;
+    try { aud.hist = await enviarAud('DELETE', null, d); aud.msg = 'Registro apagado.'; }
+    catch (err) { aud.msg = err.message === 'senha' ? 'Senha de edição incorreta: abra Editar seguidores e informe a senha.' : 'Não consegui apagar agora.'; }
+    render();
+  }
+});
+
+
+const canon = v => Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().filter(k => v[k] != null).reduce((o, k) => (o[k] = canon(v[k]), o), {}) : v;
+const iguais = (a, b) => JSON.stringify(canon(a)) === JSON.stringify(canon(b));
+
+const MESES_UP = MESES_LABEL.map(m => fold(m));
+/* ---------- Planilhas publicadas na web ---------- */
+const PLANILHAS = {
+  trafego: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSUCPcKBgxOypI3213yEWWxfLrnt_en6kfCcds5Gh90b5uvwz2el3d3fnqUnSDnjjFfFF0qkWXAWuQ9/pub?output=csv',
+  social: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQtJDijl-AzWWOzH8TvEUsW4bJZSssZVp5vtXlaE2zIB2xXogmpT7XWlgBej8rIxA/pub?output=xlsx',
+  corretores: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS7Ab3704ZCDfyNsKcgd89jC4PYRXmrHAzvbJeRR9EHe1W3oAKowGoD79xZBNmWAy7l1W1kHfAECYMH/pub?output=xlsx'
+};
+const ATUALIZAR_A_CADA_MIN = 15;
+async function baixar(url, binario) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return binario ? new Uint8Array(await r.arrayBuffer()) : await r.text();
+}
+function guardar(c, arquivo) { state.cargas[`${c.frente}__${c.mes}`] = { frente: c.frente, mes: c.mes, arquivo, atualizadoEm: new Date().toISOString(), itens: c.itens }; }
+function limpar(frentes) { Object.keys(state.cargas).forEach(k => { if (frentes.includes(state.cargas[k].frente)) delete state.cargas[k]; }); }
+
+async function carregarTrafego() {
+  try {
+    const r = parseTrafego(csvParse(await baixar(PLANILHAS.trafego)), MES_ATUAL, new Date());
+    if (r.erro || !r.cargas[0] || r.cargas[0].frente !== 'trafego') { state.syncMsg = 'A planilha publicada de campanhas não está no formato da aba Overview IG; o tráfego não foi atualizado.'; return; }
+    limpar(['trafego']); guardar(r.cargas[0], 'Overview – Campanhas'); state.syncMsg = '';
+  } catch (e) { state.syncMsg = 'Não consegui ler a planilha de campanhas agora.' + (state.cargas['trafego__atual'] ? ' Mostrando a última leitura.' : ''); }
+}
+async function carregarSocial() {
+  try {
+    if (!window.XLSX) throw new Error('sem leitor');
+    const wb = XLSX.read(await baixar(PLANILHAS.social, true), { type: 'array', cellDates: true, cellStyles: true });
+    const novas = [];
+    for (const n of wb.SheetNames) {
+      const m = fold(n).match(/^([a-z]+)\s+(\d{2})$/); if (!m) continue;
+      const i = MESES_UP.indexOf(m[1]); if (i < 0) continue;
+      const mes = `20${m[2]}-${pad2(i + 1)}`;
+      const r = parseSocial(XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: '', blankrows: true }), mes, coresDaAba(wb.Sheets[n]), true);
+      const c = !r.erro && r.cargas.find(x => x.mes === mes);
+      if (c) novas.push(c);
+    }
+    if (!novas.length) { state.syncMsgSocial = 'Não encontrei abas mensais (ex.: NOVEMBRO 26) na planilha publicada do calendário de posts.'; return; }
+    limpar(['social']); novas.forEach(c => guardar(c, 'Calendário de posts')); state.syncMsgSocial = '';
+  } catch (e) { state.syncMsgSocial = 'Não consegui ler o calendário de posts agora.' + (Object.values(state.cargas).some(c => c.frente === 'social') ? ' Mostrando a última leitura.' : ''); }
+}
+async function carregarCorretores() {
+  try {
+    if (!window.XLSX) throw new Error('sem leitor');
+    const wb = XLSX.read(await baixar(PLANILHAS.corretores, true), { type: 'array', cellDates: true });
+    const r = parseCorretores(wb.SheetNames.map(n => ({ nome: n, rows: XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: '' }) })), MES_ATUAL);
+    if (r.erro) { state.syncMsgCorr = 'Não encontrei o planejamento nem os publicados na planilha dos corretores.'; return; }
+    limpar(['cplan', 'cpub', 'cprontos']); r.cargas.forEach(c => guardar(c, 'PLANEJAMENTO MENSAL DE POSTAGENS')); state.syncMsgCorr = '';
+  } catch (e) { state.syncMsgCorr = 'Não consegui ler a planilha dos corretores agora.' + (Object.values(state.cargas).some(c => ['cplan', 'cpub', 'cprontos'].includes(c.frente)) ? ' Mostrando a última leitura.' : ''); }
+}
+async function carregarTudo(primeira) {
+  await Promise.all([carregarTrafego(), carregarSocial(), carregarCorretores()]);
+  if (primeira) state.mes = null;
+  $('estado').textContent = Object.keys(state.cargas).length ? '' : 'Não consegui ler nenhuma das planilhas. Confira se continuam publicadas na web.';
+  render();
+}
+
+function cardCampanha(c, novo) {
+  const f = state.fotos[fotoId(c.codigo)], src = fotoDe(c);
+  const ba = c.tipo === 'Brand awareness';
+  const inicio = c.inicio ? dataBr(c.inicio) + '/' + c.inicio.slice(2, 4) : '–';
+  return `<article class="camp${novo ? ' novo' : ''}">
+    <div class="ph">${src ? `<img src="${esc(src)}" alt="${esc(c.titulo || c.codigo)}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">` : ''}<span class="ph-empty"${src ? ' hidden' : ''}>${esc(ba ? 'Brand awareness' : c.codigo)}</span>
+      ${state.assets ? `<label class="ph-up">${f ? 'Trocar foto' : 'Adicionar foto'}<input type="file" accept="image/*" data-foto="${esc(c.codigo)}" hidden></label>` : ''}</div>
+    <div class="cb">
+      <div class="ct"><strong>${esc(c.titulo || c.codigo)}</strong><span class="st" style="--c:${COR.estado[c.estado]}">${esc(c.estado)}</span></div>
+      <span class="note">${esc([c.codigo, c.corretor].filter(Boolean).join(' · '))} · início ${inicio}</span>
+      <dl class="cm">
+        <div><dt>Investido</dt><dd>${c.investimento ? brl(c.investimento) : '–'}</dd></div>
+        <div><dt>${ba ? 'Impressões' : 'Leads'}</dt><dd>${ba ? fmt(c.impressoes) : c.leads ? fmt(c.leads) : '–'}</dd></div>
+        <div><dt>${ba ? 'Qualificação' : 'Qualificados'}</dt><dd>${ba ? (c.impressoes && c.qualificados ? pct(c.qualificados, c.impressoes) : '–') : (c.leads ? pct(c.qualificados, c.leads) : '–')}</dd></div>
+      </dl>
+      ${c.saude || (c.sugestao && c.estado !== 'Pausada') ? `<span class="note">${esc([c.saude, c.estado !== 'Pausada' ? c.sugestao : ''].filter(Boolean).join(' · '))}</span>` : ''}
+    </div></article>`;
+}
+/* Primeira foto de cada imóvel em mosaichomes.com.br/imoveis/<código>.
+   Para uma campanha nova: abra a página do imóvel, abra a 1ª foto em nova guia e cole o link aqui. */
+const FOTOS = {
+  MO5458: 'https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjk1ZTU0NWVhZDlhYTRhYjJhOWFmM2U4L2ltYWdlcy13YXRlcm1hcmsvODIyNWMwNDYtZGFkZC00MTFlLTk3MGYtNGRjMWJjNTk3Mjc5LmpwZWciLCJlZGl0cyI6eyJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=', // Casa Jd Guedala
+  MO6691: 'https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNmE2NGMzOGE1NTg3MGJhYzY0NDljYWExL2ltYWdlcy13YXRlcm1hcmsvMzBlYTI2YjYtNWRkNS00MGEyLWExZmEtN2MyNjQxZWExYTA5LmpwZWciLCJlZGl0cyI6eyJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=', // Bela Cintra
+  MO6809: 'https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNmE3YTM4ZjhjZGQzZjcyYzAwNTk3NGI4L2ltYWdlcy13YXRlcm1hcmsvYmQ4ZWRiYWUtNzgzZi00MDc2LWJmYzktNDAzNGRlOGE1ZmViLmpwZWciLCJlZGl0cyI6eyJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=', // Princesa Izabel
+  MO6925: 'https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNmE4YzZiYmU1ZDEwZDU5NjYxZGQ2MmUxL2ltYWdlcy13YXRlcm1hcmsvOGZkYmE2YmQtNmNjNi00ODJmLWE1NzQtNDc1NTkzNjg2MjAxLmpwZWciLCJlZGl0cyI6eyJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0='  // Jabuticabeiras
+};
+const fotoDe = c => { const f = state.fotos[fotoId(c.codigo)]; return f ? '/_blob/' + f.asset : FOTOS[codigoImovel(c.codigo) || c.codigo] || ''; };
+const fotoId = codigo => String(codigo).replace(/[^A-Za-z0-9_-]/g, '_');
+
+function nomesCanon() {
+  const full = new Set(); Object.values(state.cargas).filter(c => c.frente === 'cplan').forEach(c => c.itens.forEach(i => full.add(i.corretor)));
+  const lista = [...full];
+  return n => { if (full.has(n)) return n; const f = fold(n), c = lista.filter(x => fold(x).split(' ')[0] === f.split(' ')[0]); return c.length === 1 && f.split(' ').length === 1 ? c[0] : n; };
+}
+
+/* Publicadas = status "Publicado" no planejamento OU link na aba de publicados.
+   Um status casa com um link do mesmo corretor e rede com até 1 dia de diferença, e aí conta uma vez só. */
+function publicadas(plan, links, canon) {
+  const dia = iso => Date.parse(iso + 'T12:00:00Z') / 864e5;
+  const out = links.map(p => ({ ...p, corretor: canon(p.corretor), fonte: 'link' })), usados = new Set();
+  for (const i of plan.filter(i => i.etapa === 'Publicado')) {
+    const corretor = canon(i.corretor);
+    const k = out.findIndex((p, x) => p.fonte === 'link' && !usados.has(x) && p.corretor === corretor && p.rede === i.rede && Math.abs(dia(p.data) - dia(i.data)) <= 1);
+    if (k >= 0) usados.add(k); else out.push({ data: i.data, corretor, rede: i.rede, fonte: 'status' });
+  }
+  return out;
+}
+
+/* Tooltip do gráfico de planejadas: quem "banca" o número da semana naquela etapa */
+const primeiro = n => String(n).split(' ')[0];
+function quemBanca(itens, etapa) {
+  if (!itens.length) return '';
+  const por = sorted(countBy(itens, i => i.corretor));
+  let t = '\n' + por.slice(0, 4).map(([n, v]) => `${primeiro(n)} ${v}`).join(' · ') + (por.length > 4 ? ` · +${por.length - 4} ${por.length - 4 > 1 ? 'outros' : 'outro'}` : '');
+  const sts = sorted(countBy(itens.filter(i => i.status && fold(i.status) !== fold(etapa)), i => fold(i.status)));
+  if (sts.length) {
+    const frase = sts.slice(0, 3).map(([st]) => {
+      const [n, v] = sorted(countBy(itens.filter(i => fold(i.status) === st), i => i.corretor))[0];
+      return [primeiro(n), st === 'corretor atrasou' ? 'atrasados pelo corretor' : st, v];
+    });
+    const partes = frase.map(([n, st, v], k) => k === 0 ? `${n} é o corretor com mais conteúdos ${st} (${v})` : `${n}, ${st} (${v})`);
+    t += '\n' + (partes.length > 1 ? partes.slice(0, -1).join('; ') + ' e ' + partes[partes.length - 1] : partes[0]) + '.';
+  }
+  return t;
+}
+/* Posts publicados com link (status Publicado no planejamento + aba de publicados), sem repetir o mesmo link */
+function linksPublicados(plan, links, canon, m) {
+  const chave = u => String(u).replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+  const por = new Map();
+  for (const i of [...plan.filter(i => i.etapa === 'Publicado' && i.link), ...links.filter(p => p.link)]) {
+    const k = chave(i.link), a = por.get(k);
+    if (a) { if (!a.redes.includes(i.rede)) a.redes.push(i.rede); continue; }
+    por.set(k, { data: i.data, corretor: canon(i.corretor), redes: [i.rede], link: i.link });
+  }
+  const lista = [...por.values()].sort((a, b) => b.data.localeCompare(a.data) || a.corretor.localeCompare(b.corretor));
+  const tipo = u => /instagram\.com/i.test(u) ? 'Ver no Instagram' : /drive\.google/i.test(u) ? 'Ver vídeo (Drive)' : /tiktok\.com/i.test(u) ? 'Ver no TikTok' : /linkedin\.com/i.test(u) ? 'Ver no LinkedIn' : 'Abrir link';
+  return `<section class="panel">${secHead('Posts publicados', lista.length ? `${fmt(lista.length)} ${lista.length > 1 ? 'publicações' : 'publicação'} com link em ${mesLabel(m).toLowerCase()}` : '')}<div class="card">${lista.length
+    ? `<div class="tbl"><table><thead><tr><th>Data</th><th>Corretor</th><th>Rede</th><th>Conteúdo</th></tr></thead><tbody>${lista.map(p => `<tr><td class="num">${dataBr(p.data)}</td><td>${esc(p.corretor)}</td><td>${esc(p.redes.join(', '))}</td><td><a href="${esc(p.link)}" target="_blank" rel="noopener">${tipo(p.link)}</a></td></tr>`).join('')}</tbody></table></div>
+      <p class="note">Linhas com status Publicado e link na planilha PLANEJAMENTO MENSAL DE POSTAGENS, mais os links da aba de publicados.</p>`
+    : `<p class="note">Nenhuma publicação com link em ${mesLabel(m)}. Entram as linhas com status Publicado e link preenchido na planilha.</p>`}</div></section>`;
+}
+
+function renderCorretores() {
+  const m = state.mes, canon = nomesCanon();
+  const plan = itensDe('cplan', m);
+  const pub = publicadas(plan, itensDe('cpub', m), canon), temPub = !!carga('cpub', m) || pub.length > 0;
+  const et = countBy(plan, i => i.etapa), aprov = (et['Aprovado'] || 0) + (et['Publicado'] || 0);
+  let h = `<div class="grid">
+    ${kpi(plan.length ? fmt(plan.length) : '–', 'peças planejadas', plan.length ? ORD.redeC.map(r => `${plan.filter(i => i.rede === r).length} ${r}`).join(' · ') : 'sem planejamento do mês')}
+    ${kpi(plan.length ? fmt(aprov) : '–', 'aprovadas pelo corretor', plan.length ? pct(aprov, plan.length) + ' do planejado, incluindo as já publicadas' : '')}
+    ${kpi(plan.length ? fmt(et['Reprovado'] || 0) : '–', 'reprovadas pelo corretor', plan.length ? `${fmt((et['Em aprovação'] || 0))} aguardando aprovação` : '')}
+    ${kpi(temPub ? fmt(pub.length) : '–', 'publicadas', temPub ? `${new Set(pub.map(p => p.corretor)).size} corretores` : 'sem publicações registradas')}
+  </div>
+  <p class="note">Gestão de mídias dos corretores começou em setembro de 2026. Semanas de domingo a sábado.</p>`;
+  if (state.syncMsgCorr) h += `<p class="note warn-note">${esc(state.syncMsgCorr)}</p>`;
+  h += `<section class="panel">${secHead('Semana a semana', fonteTxt(carga('cplan', m), carga('cpub', m)))}<div class="grid">`;
+  h += `<div class="card c7"><h3>Peças planejadas por semana</h3>${plan.length ? legend(ORD.etapaC, COR.etapaC, new Set(plan.map(i => i.etapa))) + colunas(porSemana(plan, m, i => i.etapa), ORD.etapaC, COR.etapaC, { aria: 'Peças planejadas por semana, por etapa', W: 620, tipExtra: (g, se) => quemBanca(plan.filter(i => i.data >= g.ini && i.data <= g.fim && i.etapa === se).map(i => ({ ...i, corretor: canon(i.corretor) })), se) }) : vazio(`Sem planejamento para ${mesLabel(m)}.`, 'Envie a planilha PLANEJAMENTO MENSAL DE POSTAGENS (XLSX com todas as abas).', 'corretores')}</div>`;
+  h += `<div class="card c5"><h3>Publicadas por semana</h3>${pub.length ? colunas(porSemana(pub, m, () => 'Publicadas'), ['Publicadas'], { Publicadas: 'var(--accent)' }, { aria: 'Publicações por semana' }) + '<p class="note">Conta o status Publicado no planejamento ou o link na aba de publicados; o mesmo post não entra duas vezes.</p>' : `<p class="note">Nenhuma publicação registrada em ${mesLabel(m)}. Conta o status Publicado no planejamento ou o link na aba de publicados.</p>`}</div>`;
+  h += `</div></section>`;
+
+  if (plan.length) {
+    const cor = [...new Set(plan.map(i => i.corretor))];
+    const cel = {}; plan.forEach(i => { const k = i.corretor + '|' + i.rede; cel[k] = (cel[k] || 0) + 1; });
+    const linhas = cor.map(n => ({ n, v: ORD.redeC.map(r => cel[n + '|' + r] || 0) })).map(l => ({ ...l, t: l.v.reduce((a, b) => a + b, 0) })).sort((a, b) => b.t - a.t);
+    const max = Math.max(1, ...linhas.flatMap(l => l.v));
+    const tot = ORD.redeC.map((_, k) => linhas.reduce((a, l) => a + l.v[k], 0));
+    const cell = (v, n, r) => `<td class="mx" style="--p:${v ? Math.round(12 + v / max * 40) : 0}%" data-tip="${esc(`${n} · ${r}: ${v} ${v === 1 ? 'post' : 'posts'}`)}">${v || '<span class="note">–</span>'}</td>`;
+    h += `<section class="panel">${secHead('Corretores x canais', `Posts planejados em ${mesLabel(m).toLowerCase()}`)}<div class="card"><div class="tbl"><table class="matriz"><thead><tr><th>Corretor</th>${ORD.redeC.map(r => `<th class="r">${r}</th>`).join('')}<th class="r">Total</th></tr></thead><tbody>
+      ${linhas.map(l => `<tr><td>${esc(l.n)}</td>${l.v.map((v, k) => cell(v, l.n, ORD.redeC[k])).join('')}<td class="r"><strong>${fmt(l.t)}</strong></td></tr>`).join('')}
+      <tr class="tot"><td>Total</td>${tot.map(v => `<td class="r">${fmt(v)}</td>`).join('')}<td class="r">${fmt(plan.length)}</td></tr>
+    </tbody></table></div></div></section>`;
+  }
+  h += linksPublicados(plan, itensDe('cpub', m), canon, m);
+  const nomes = [...new Set([...plan.map(i => i.corretor), ...pub.map(p => p.corretor)])];
+  if (nomes.length) {
+    const linhas = nomes.map(n => {
+      const p = plan.filter(i => i.corretor === n), e = countBy(p, i => i.etapa);
+      return { n, p, e, pub: pub.filter(x => x.corretor === n).length };
+    }).sort((a, b) => b.p.length - a.p.length || b.pub - a.pub);
+    const max = Math.max(1, ...linhas.map(l => l.p.length));
+    h += `<section class="panel">${secHead('Por corretor')}<div class="card"><div class="tbl"><table><thead><tr><th>Corretor</th><th>Planejadas por etapa</th><th class="r">Planejadas</th><th class="r">Aprovadas</th><th class="r">Reprovadas</th><th class="r">Publicadas</th></tr></thead><tbody>
+    ${linhas.map(l => `<tr><td>${esc(l.n)}</td><td style="min-width:140px"><span class="bar-in" style="width:${l.p.length / max * 100}%" data-tip="${esc(l.n + ': ' + ORD.etapaC.filter(s => l.e[s]).map(s => `${l.e[s]} ${s.toLowerCase()}`).join(', '))}">${ORD.etapaC.filter(s => l.e[s]).map(s => `<i style="flex:${l.e[s]};background:${COR.etapaC[s]}"></i>`).join('')}</span></td>
+      <td class="r">${fmt(l.p.length)}</td><td class="r">${fmt((l.e['Aprovado'] || 0) + (l.e['Publicado'] || 0))}</td><td class="r">${fmt(l.e['Reprovado'] || 0)}</td><td class="r">${fmt(l.pub)}</td></tr>`).join('')}
+    </tbody></table></div></div></section>`;
+  }
+  $('painel-corretores').innerHTML = h;
+}
+
+/* ---------- Eventos ---------- */
+$('mes').addEventListener('change', e => { state.mes = e.target.value; render(); });
+document.querySelectorAll('[role=tab]').forEach(t => {
+  t.addEventListener('click', () => { state.aba = t.dataset.aba; try { history.replaceState(null, '', '#' + state.aba); } catch { } render(); });
+  t.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { state.aba = state.aba === 'marca' ? 'corretores' : 'marca'; render(); document.querySelector(`[data-aba=${state.aba}]`).focus(); } });
+});
+if (location.hash === '#corretores') state.aba = 'corretores';
+document.addEventListener('click', e => {
+  const sub = e.target.closest('[data-sub]'); if (sub) { state.subTraf = sub.dataset.sub; render(); }
+});
+
+const tip = $('tip');
+document.addEventListener('pointermove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.dataset.tip; tip.hidden = false;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8), y = e.clientY + 16 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 16;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+});
+document.addEventListener('pointerleave', () => tip.hidden = true);
+
+/* ---------- Início ---------- */
+render();
+carregarAudiencia().then(render);
+carregarTudo(true);
+setInterval(() => carregarTudo(false), ATUALIZAR_A_CADA_MIN * 60e3);
+
+</script>
+
+</body></html>
